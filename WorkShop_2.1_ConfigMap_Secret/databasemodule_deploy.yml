@@ -44,7 +44,7 @@ spec:
   spec:
     containers:
     - name: maindb
-      image: labdocker/mysql:latest
+      image: labdocker/mariadb:latest
       ports:
         - containerPort: 3306
           protocol: TCP
