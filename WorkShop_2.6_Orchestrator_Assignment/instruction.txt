@@ -1,0 +1,103 @@
+Instruction for Workshop 2.6 Orchestrator Assignment:
+Note: This instruction will demonstration for assign pods to node with several constrain:
+====================================================
+Lab Description:
+Machine name		            Roles:						IP Address: (Private)		IP Address: (Public)
+GroupX_Kubernetes_Master	    Master						10.0.X.X					X.X.X.X					
+GroupX_Kubernetes_Worker1       NodePort					10.0.X.X					X.X.X.X
+GroupX_Kubernetes_Worker2       NodePort					10.0.X.X					X.X.X.X
+===================================================
+Part 1: nodeSelector:
+1. (Client Machine) SSH to kubernetes
+ssh -i k8s_lab ubuntu@<Public IP Address of Master>
+ssh -i k8s_lab ubuntu@<Public IP Address of NodePort1>
+ssh -i k8s_lab ubuntu@<Public IP Address of NodePort2>
+
+2. (Client Machine) SCP file test by command (Or github can skip):
+scp -i k8s_lab *.yml ubuntu@<Public IP Address of master>:/home/ubuntu/
+scp -i k8s_lab *.yml ubuntu@<Public IP Address of node1>:/home/ubuntu/
+scp -i k8s_lab *.yml ubuntu@<Public IP Address of node2>:/home/ubuntu/
+
+3. (Master) Add Label by command:
+
+kubectl get nodes:
+====================================================
+Example Output:
+kubuntu@ip-10-0-1-17:~$ kubectl get nodes
+NAME            STATUS    ROLES     AGE       VERSION
+ip-10-0-1-17    Ready     master    2h        v1.9.2
+ip-10-0-1-23    Ready     <none>    1h        v1.9.2
+ip-10-0-1-246   Ready     <none>    1h        v1.9.2
+====================================================
+
+	kubectl label nodes <name master> storage=M2
+	kubectl label nodes <name worker1> storage=SSD
+	kubectl label nodes <name worker2> storage=SAS
+
+4. (Master) Create Pods by command:
+	kubectl create -f webtest_pod_nodeselector.yml	(In case run via github or Play with K8S: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_nodeselector.yml)
+
+5. (Master) Monitor Pods location by command:
+	kubectl get pods -o wide
+	kubectl describe pods/webtest
+
+6. (Master) Delete Pods by command:
+	kubectl delete -f webtest_pod_nodeselector.yml	(In case run via github or Play with K8S: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_nodeselector.yml)
+
+Part 2: Interlude:
+1. (Master) Create Pods by command:
+	kubectl create -f webtest_pod_interlude.yml	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_interlude.yml)
+
+2. (Master) Monitor Pods location by command:
+	kubectl get pods -o wide
+	kubectl describe pods/webtest
+
+3. (Master) Delete Pods by command:
+	kubectl delete -f webtest_pod_interlude.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_interlude.yml)
+
+Part 3: Affinity (Node):
+1. (kubernetes-ms,node1) Create Pods by command:
+	kubectl create -f webtest_pod_affinity.yml	(In case run via github or Play with K8S: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_affinity.yml)
+
+2. (kubernetes-ms,node1) Monitor Pods location by command:
+	kubectl get pods -o wide
+	kubectl describe pods/webtest
+
+Part 4: Inter-Pod Affinity and Anti-affinity:
+1. (Master) Create Pods by command:
+	kubectl create -f webtest_pod_affinity_topokey.yml	(In case run via github or Play with K8S: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_affinity_topokey.yml)
+
+2. (Master) Monitor Pods location by command:
+	kubectl get pods -o wide
+	kubectl describe pods/webtest2
+
+3. (Master) Delete Pods by command:
+	kubectl delete -f webtest_pod_affinity_topokey.yml	(In case run via github or Play with K8S:: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_affinity_topokey.yml)
+	kubectl delete -f webtest_pod_affinity.yml	(In case run via github or Play with K8S:: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_affinity.yml)
+
+Part 5: Taint and Tolerations
+1. (Master) Set Taint on node Master for admin operate by command:
+	kubectl get nodes
+	kubectl taint nodes <Master Name> dedicated=admin:NoSchedule
+
+2. (Master) Create Pods by command:
+	kubectl create -f webtest_pod_nodeselector.yml	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_nodeselector.yml)
+
+3. (Master) Monitor Pods location by command:
+	kubectl get pods -o wide
+	kubectl describe pods/webtest
+
+	kubectl delete -f webtest_pod_nodeselector.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_nodeselector.yml)
+
+4. (Master) Create Tolerations Pods by command:
+	kubectl create -f webtest_pod_taint.yml	(In case run via github:: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_taint.yml)
+
+5. (Master) Monitor Pods location by command:
+	kubectl get pods -o wide
+	kubectl describe pods/webtest
+
+6. (Master) Delete and Clear Taint by command:
+	kubectl delete -f webtest_pod_taint.yml	(In case run via github : kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.6_Orchestrator_Assignment/webtest_pod_taint.yml)
+	kubectl get nodes
+	kubectl taint nodes <Master Name> dedicated-
+	

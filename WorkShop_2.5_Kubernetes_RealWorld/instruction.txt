@@ -1,0 +1,6 @@
+Instruction for Workshop 2.5 Kubernetes in RealWorld:
+Note: This instruction will start lab for kubernetes for real workshop:
+
+1. Prepare machine for lab.
+
+	1.1 In Case of AWS: Please follow Instruction "instruction_AWS"

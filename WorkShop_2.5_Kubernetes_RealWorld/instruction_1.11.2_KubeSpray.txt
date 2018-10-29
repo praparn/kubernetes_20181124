@@ -1,0 +1,266 @@
+Instruction for Workshop 2.5 Kubernetes in RealWorld:
+Note: This instruction will start lab for kubernetes for real workshop on AWS:
+====================================================
+Lab Description: (Check you excel sheet)
+Machine name		            		Roles:						IP Address: (Private)		IP Address: (Public)
+scblf-dev-kubernetes-master-1	   		Master						10.21.219.35		
+scblf-dev-kubernetes-master-2       	Master						10.21.219.37
+scblf-dev-kubernetes-master-3       	Master						10.21.219.40
+scblf-dev-kubernetes-ingress-1      	Ingress						10.21.219.20
+scblf-dev-kubernetes-ingress-2    	 	Ingress						10.21.219.42
+scblf-dev-kubernetes-ingress-3	     	Ingress						10.21.219.21
+scblf-dev-kubernetes-worker-1      		Worker						10.21.219.48
+scblf-dev-kubernetes-worker-2      		Worker						10.21.219.46
+scblf-dev-kubernetes-worker-3     		Worker						10.21.219.43
+scblf-uat-kubernetescis-ansible-1		Ansible						10.21.219.11	
+
+
+===================================================
+Step to Setup KuberSpray
+===================================================
+1. (Ansible Server) Generate Private Key for Operate SSHx
+	1.1 #Copy Credential#
+	scp -i "scblife-access.pem" scblife-access.pem ubuntu@10.21.219.11:/home/ubuntu/scblife-access.pem
+
+  	1.2 Generate key on ansible node and sent to all host:
+    eval $(ssh-agent)
+    ssh-keygen -t rsa -N "" -f /home/ubuntu/.ssh/id_rsa
+    ssh-add /home/ubuntu/.ssh/id_rsa
+    chmod 600 ~/.ssh/id_rsa
+    cat ~/.ssh/id_rsa.pub | ssh -i scblife-access.pem ubuntu@10.21.219.35 "cat >> ~/.ssh/authorized_keys"  & ssh -A 10.21.219.35  & sudo -E -s
+    cat ~/.ssh/id_rsa.pub | ssh -i scblife-access.pem ubuntu@10.21.219.37 "cat >> ~/.ssh/authorized_keys"  & ssh -A 10.21.219.37  & sudo -E -s
+    cat ~/.ssh/id_rsa.pub | ssh -i scblife-access.pem ubuntu@10.21.219.40 "cat >> ~/.ssh/authorized_keys"  & ssh -A 10.21.219.40  & sudo -E -s
+    cat ~/.ssh/id_rsa.pub | ssh -i scblife-access.pem ubuntu@10.21.219.20 "cat >> ~/.ssh/authorized_keys"  & ssh -A 10.21.219.20  & sudo -E -s
+    cat ~/.ssh/id_rsa.pub | ssh -i scblife-access.pem ubuntu@10.21.219.42 "cat >> ~/.ssh/authorized_keys"  & ssh -A 10.21.219.42  & sudo -E -s
+    cat ~/.ssh/id_rsa.pub | ssh -i scblife-access.pem ubuntu@10.21.219.21 "cat >> ~/.ssh/authorized_keys"  & ssh -A 10.21.219.21  & sudo -E -s
+    cat ~/.ssh/id_rsa.pub | ssh -i scblife-access.pem ubuntu@10.21.219.48 "cat >> ~/.ssh/authorized_keys"  & ssh -A 10.21.219.48  & sudo -E -s
+    cat ~/.ssh/id_rsa.pub | ssh -i scblife-access.pem ubuntu@10.21.219.46 "cat >> ~/.ssh/authorized_keys"  & ssh -A 10.21.219.46 & sudo -E -s
+    cat ~/.ssh/id_rsa.pub | ssh -i scblife-access.pem ubuntu@10.21.219.43 "cat >> ~/.ssh/authorized_keys"  & ssh -A 10.21.219.43  & sudo -E -s
+
+2. (Ansible Server) Clone git of kubespray and prepare require python component:
+	export LC_ALL=C
+	git clone https://github.com/kubernetes-incubator/kubespray.git
+	cd ./kubespray 
+	sudo apt install -y python-pip && sudo pip install -r requirements.txt && pip install netaddr
+
+3. (Ansible Server) Configure ansible playbook for operate kubernetes farm:
+	3.1 Copy sample play book for operate:
+	cp -rfp inventory/sample inventory/k8scluster
+
+	3.2 Update inventory of Host (Master/Worker) by command:
+	*Remark***************************************************************************************************************************************
+	add sequence of ip address like below:
+	<master 1>
+	<master 2>
+	<master 3>
+	<worker 1>
+	<worker 2>
+	<worker 3>
+	<ingress 1>
+	<ingress 2>
+	<ingress 3>
+	**********************************************************************************************************************************************
+
+	declare -a IPS=(10.21.219.35 10.21.219.37 10.21.219.40 10.21.219.20 10.21.219.42 10.21.219.21 10.21.219.48 10.21.219.46 10.21.219.43)
+	CONFIG_FILE=inventory/k8scluster/hosts.ini python3 contrib/inventory_builder/inventory.py ${IPS[@]}
+
+4. (Ansible Server) Edit host.ini on ./inventory/k8scluster/hosts.ini as below
+
+	***********************************************************************************************************************************************
+[all]
+scblf-dev-kubernetes-master-1    ansible_host=10.21.221.16 ansible_connection=ssh ansible_user=ubuntu ansible_become=yes ip=10.21.221.16
+scblf-dev-kubernetes-master-2    ansible_host=10.21.221.51 ansible_connection=ssh ansible_user=ubuntu ansible_become=yes ip=10.21.221.51
+scblf-dev-kubernetes-master-3    ansible_host=10.21.221.56 ansible_connection=ssh ansible_user=ubuntu ansible_become=yes ip=10.21.221.56
+scblf-dev-kubernetes-ingress-1    ansible_host=10.21.221.41 ansible_connection=ssh ansible_user=ubuntu ansible_become=yes ip=10.21.221.41
+scblf-dev-kubernetes-ingress-2    ansible_host=10.21.221.28 ansible_connection=ssh ansible_user=ubuntu ansible_become=yes ip=10.21.221.28
+scblf-dev-kubernetes-ingress-3    ansible_host=10.21.221.61 ansible_connection=ssh ansible_user=ubuntu ansible_become=yes ip=10.21.221.61
+scblf-dev-kubernetes-worker-1    ansible_host=10.21.221.48 ansible_connection=ssh ansible_user=ubuntu ansible_become=yes ip=10.21.221.48
+scblf-dev-kubernetes-worker-2    ansible_host=10.21.221.49 ansible_connection=ssh ansible_user=ubuntu ansible_become=yes ip=10.21.221.49
+scblf-dev-kubernetes-worker-3    ansible_host=10.21.221.39 ansible_connection=ssh ansible_user=ubuntu ansible_become=yes ip=10.21.221.39
+
+[kube-master]
+scblf-dev-kubernetes-master-1
+scblf-dev-kubernetes-master-2
+scblf-dev-kubernetes-master-3
+
+[kube-node]
+scblf-dev-kubernetes-ingress-1
+scblf-dev-kubernetes-ingress-2
+scblf-dev-kubernetes-ingress-3
+scblf-dev-kubernetes-worker-1
+scblf-dev-kubernetes-worker-2
+scblf-dev-kubernetes-worker-3
+
+[etcd]
+scblf-dev-kubernetes-master-1
+scblf-dev-kubernetes-master-2
+scblf-dev-kubernetes-master-3
+
+[k8s-cluster:children]
+kube-node
+kube-master
+
+[calico-rr]
+
+[vault]
+scblf-dev-kubernetes-master-1
+scblf-dev-kubernetes-master-2
+scblf-dev-kubernetes-master-3
+********************************************************************************************************************************************
+
+5. (Ansible Server) Edit file ./inventory/k8scluster/group_vars/all.yml as below
+	sed -i -e 's/bootstrap_os: none/bootst  rap_os: ubuntu/g' ./inventory/k8scluster/group_vars/all.yml
+	sed -i -e 's/#kubelet_load_modules: false/kubelet_load_modules: true/g' ./inventory/k8scluster/group_vars/all.yml
+	sed -i -e 's/#kube_read_only_port: 10255/kube_read_only_port: 10255/g' ./inventory/k8scluster/group_vars/all.yml
+	sed -i -e 's/#etcd_memory_limit: "512M"/etcd_memory_limit: "2048M"/g' ./inventory/k8scluster/group_vars/all.yml
+	sed -i -e 's/#docker_storage_options: -s overlay2/docker_storage_options: -s overlay2/g' ./inventory/k8scluster/group_vars/all.yml
+
+6. (Ansible Server) Edit file ./inventory/k8scluster/group_vars/k8s-cluster.yml as below
+	sed -i -e 's/efk_enabled: false/efk_enabled: true/g' ./inventory/k8scluster/group_vars/k8s-cluster.yml
+	sed -i -e 's/helm_enabled: false/helm_enabled: true/g' ./inventory/k8scluster/group_vars/k8s-cluster.yml
+	sed -i -e 's/dns_mode: kubedns/dns_mode: coredns/g' ./inventory/k8scluster/group_vars/k8s-cluster.yml
+	#sed -i -e 's/kube_proxy_mode: iptables/kube_proxy_mode: ipvs/g' ./inventory/k8scluster/group_vars/k8s-cluster.yml
+	#sed -i -e 's/ingress_nginx_enabled: false/ingress_nginx_enabled: true/g' ./inventory/k8scluster/group_vars/k8s-cluster.yml
+	#sed -i -e 's/# ingress_nginx_namespace: "ingress-nginx"/ingress_nginx_namespace: "ingress-nginx"/g' ./inventory/k8scluster/group_vars/k8s-cluster.yml
+	#sed -i -e 's/# ingress_nginx_insecure_port: 80/ingress_nginx_insecure_port: 80/g' ./inventory/k8scluster/group_vars/k8s-cluster.yml
+	#sed -i -e 's/# ingress_nginx_secure_port: 443/ingress_nginx_secure_port: 443/g' ./inventory/k8scluster/group_vars/k8s-cluster.yml
+	#sed -i -e 's/# ingress_nginx_configmap:/ingress_nginx_configmap:/g' ./inventory/k8scluster/group_vars/k8s-cluster.yml
+	#sed -i -e 's/#   map-hash-bucket-size: "128"/   map-hash-bucket-size: "128"/g' ./inventory/k8scluster/group_vars/k8s-cluster.yml
+
+	*Remark: Ref:https://github.com/kubernetes-incubator/kubespray/tree/master/roles/kubernetes-apps/ingress_controller/ingress_nginx We decision for manul deploy ingress on this moment
+
+
+#####################################################################Special for AWS#########################################################################
+(Ansible Server) Special for AWS:
+	To use aws storage class and capability on AWS cloud. We need to configure some special configuration as below (https://github.com/kubernetes-incubator/kubespray/blob/master/docs/aws.md)
+
+#############################################################################################################################################################	
+
+7. (Ansible Server) Run Ansible Playbook
+	sudo cp -R /usr/local/lib/python2.7/dist-packages/ansible/modules/hashivault /usr/lib/python2.7/dist-packages/ansible/modules/
+	sudo chmod -R 755 /usr/lib/python2.7/dist-packages/ansible/modules/hashivault
+	ansible-playbook -i inventory/k8scluster/hosts.ini cluster.yml
+
+	###Incase we need to refresh install###
+	ansible-playbook -i inventory/k8scluster/hosts.ini reset.yml
+	ansible-playbook -i inventory/k8scluster/hosts.ini cluster.yml
+
+	###Incase we need to add new node (worker)###
+	- edit file host.ini and add new node on [all] and [kube-node]
+	- ansible-playbook -i inventory/k8scluster/hosts.ini scale.yml
+
+	###Incase we need to add remove node (worker)###
+	- edit file host.ini and add "only" target node on [kube-node]
+	- ansible-playbook -i inventory/k8scluster/hosts.ini remove-node.yml
+
+
+
+8. (Master) Test deployment basic nginx pods by command
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config	==> Copy Credential to User Path
+sudo chown $(id -u):$(id -g) $HOME/.kube/config				==> Change Credential Permission
+kubectl create clusterrolebinding insecure-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard ==> Add Cluster Permission
+kubectl run webtest --image=labdocker/nginx:latest --port=80
+kubectl get pods -o wide
+kubectl expose deployment webtest --target-port=80 --type=NodePort
+kubectl get svc -o wide
+
+9. (Master) Test get web outside (Anynode):
+https://x.x.x.x:xxxx
+https://x.x.x.x:xxxx
+https://x.x.x.x:xxxx
+
+10. (Master) Cleanup Lab by command:
+kubectl delete deployment/webtest
+kubectl delete svc/webtest
+
+11. (Local) Test access kubernetes dashboard by command:
+scp -i scblife-access.pem ubuntu@<ip address of master>:/home/ubuntu/.kube/config adminconfig.conf
+kubectl --kubeconfig ./adminconfig.conf get nodes
+kubectl --kubeconfig ./adminconfig.conf get svc
+kubectl --kubeconfig ./adminconfig.conf proxy --accept-hosts '.*'
+
+12. (local) Open browser dashboard by command
+http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+
+13. (local) Test access kibana for EFK logging
+http://localhost:8001/api/v1/namespaces/kube-system/services/kibana-logging/proxy/app/kibana
+Choose Menu: create index pattern: logstash-*
+Choose Menu: Discovery
+
+====================================== Create Ingress Controller====================================================
+
+14. (Master) Create ingress set:
+# Create Namespace and SA 
+kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/install/common/ns-and-sa.yaml
+
+# Create Default Secret for 404 Return
+kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/install/common/default-server-secret.yaml
+
+# Add optional for configure nginx customization (Ref: https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/customization)
+curl https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/install/common/nginx-config.yaml > nginx-config.yaml
+vi ./nginx-config.yaml
+========================================
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-config
+  namespace: nginx-ingress
+data:
+  client-max-body-size: "50m" 
+========================================
+kubectl apply -f nginx-config.yaml
+
+# Configure rbac
+kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/install/rbac/rbac.yaml
+
+# Create Daemon Setup
+kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/install/daemon-set/nginx-ingress.yaml
+
+# Check ingress running
+watch kubectl get pods --namespace=nginx-ingress
+
+22. (Master) Test deploy ingress service
+
+# Create Service/Pods/Deployment for webtest1 and webtest2 by command:
+	kubectl create -f webtest_deploy.yml 	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/webtest_deploy.yml )
+	kubectl create -f webtest_deploy2.yml 	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/webtest_deploy2.yml )
+
+# View service for connection by command:
+	kubectl get svc -o wide
+
+# Test access pods via dns inside by command:
+	kubectl run curl --image=radial/busyboxplus:curl -i --tty
+	curl http://<ip of webtest1> or curl http://webtest1
+	curl http://<ip of webtest2> or durl http://webtest2
+
+# Create ingress for access by command:
+	kubectl create -f ingress_webtest.yml 	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/ingress_webtest.yml )
+	kubectl get ing -o wide
+	kubectl describe ing/ingresswebtest
+
+23. Test access website by command or browser:
+	curl http://<Public IP of Any Node> -H 'Host:webtest1.kuberneteslabthailand.com'
+	curl http://<Public IP of Any Node> -H 'Host:webtest2.kuberneteslabthailand.com'
+
+24. Delete Existing Ingress by command:
+	kubectl delete -f ingress_webtest.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/ingress_webtest.yml)
+
+25. Create TLS Secret by command:
+	kubectl create -f ingress_webtest_tls_secret_webtest1.yml 	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls_secret_webtest1.yml )
+	kubectl create -f ingress_webtest_tls_secret_webtest2.yml 	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls_secret_webtest2.yml )
+
+26. Create ingress for TLS by command:
+	kubectl create -f ingress_webtest_tls.yml 	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls.yml )
+	kubectl get ing/ingresswebtesttls -o wide
+	kubectl describe ing/ingresswebtesttls
+
+27. Test access website by browser:
+	https://webtest1.kuberneteslabthailand.com
+	https://webtest2.kuberneteslabthailand.com
+	
+28. Clean Up Lab:
+	kubectl delete -f ingress_webtest_tls.yml	 (In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls.yml)
+	kubectl delete -f ingress_webtest_tls_secret_webtest1.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls_secret_webtest1.yml)
+	kubectl delete -f ingress_webtest_tls_secret_webtest2.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls_secret_webtest2.yml)
+	kubectl delete -f webtest_deploy.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/webtest_deploy.yml)
+	kubectl delete -f webtest_deploy2.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_2.4_Ingress_Network/webtest_deploy2.yml)
