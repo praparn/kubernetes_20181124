@@ -4,7 +4,7 @@ There are two NGINX-based Ingress controller implementations out there: the one 
 
 ## Which One Am I Using?
 
-If you are unsure about which implementation you are using, check the container image of the Ingress controller that is running. For the nginxinc/kubernetes-ingress Ingress controller its Docker image is published on [DockerHub](https://hub.docker.com/r/nginxdemos/nginx-ingress/) and available as *nginxdemos/nginx-ingress*.
+If you are unsure about which implementation you are using, check the container image of the Ingress controller that is running. For the nginxinc/kubernetes-ingress Ingress controller its Docker image is published on [DockerHub](https://hub.docker.com/r/nginx/nginx-ingress/) and available as *nginx/nginx-ingress*.
 
 ## The Key Differences
 
@@ -17,24 +17,24 @@ The table below summarizes the key difference between nginxinc/kubernetes-ingres
 | NGINX version | [Custom](https://github.com/kubernetes/ingress-nginx/tree/master/images/nginx) NGINX build that includes several third-party modules | NGINX official mainline [build](https://github.com/nginxinc/docker-nginx) | NGINX Plus |
 | Commercial support | N/A | N/A | Included |
 | **Load balancing configuration** |
-| Merging Ingress rules with the same host | Supported | Under consideration | Under consideration |
-| HTTP load balancing extensions - Annotations | See the [supported annotations](https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/annotations.md) | See the [supported annotations](https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/customization) | See the [supported annotations](https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/customization)|
-| HTTP load balancing extensions -- ConfigMap | See the [supported ConfigMap keys](https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/configmap.md) | See the [supported ConfigMap keys](https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/customization) | See the [supported ConfigMap keys](https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/customization) |
-| TCP/UDP | Supported via a ConfigMap | Not supported | Not supported |
+| Merging Ingress rules with the same host | Supported | Supported | Supported |
+| HTTP load balancing extensions - Annotations | See the [supported annotations](https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/annotations.md) | See the [supported annotations](configmap-and-annotations.md) | See the [supported annotations](configmap-and-annotations.md)|
+| HTTP load balancing extensions -- ConfigMap | See the [supported ConfigMap keys](https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/configmap.md) | See the [supported ConfigMap keys](configmap-and-annotations.md) | See the [supported ConfigMap keys](configmap-and-annotations.md) |
+| TCP/UDP | Supported via a ConfigMap | Supported via a ConfigMap with native NGINX configuration | Supported via a ConfigMap with native NGINX configuration |
 | Websocket  | Supported | Supported via an [annotation](https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/websocket) | Supported via an [annotation](https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/websocket) |
 | TCP SSL Passthrough | Supported via a ConfigMap | Not supported | Not supported |
 | JWT validation | Not supported | Not supported | Supported |
 | Session persistence | Supported via a third-party module | Not supported | Supported |
-| Configuration templates *1 | See the [template](https://github.com/kubernetes/ingress-nginx/blob/master/rootfs/etc/nginx/template/nginx.tmpl) | See the [templates](https://github.com/nginxinc/kubernetes-ingress/tree/master/nginx-controller/nginx/templates) | See the [templates](https://github.com/nginxinc/kubernetes-ingress/tree/master/nginx-controller/nginx/templates) |
+| Configuration templates *1 | See the [template](https://github.com/kubernetes/ingress-nginx/blob/master/rootfs/etc/nginx/template/nginx.tmpl) | See the [templates](https://github.com/nginxinc/kubernetes-ingress/tree/master/internal/nginx/templates) | See the [templates](https://github.com/nginxinc/kubernetes-ingress/tree/master/internal/nginx/templates) |
 | **Deployment** |
-| Command-line arguments *2 | See the [arguments](https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/cli-arguments.md) | See the [arguments](https://github.com/nginxinc/kubernetes-ingress/blob/master/nginx-controller/main.go#L27) | See the [arguments](https://github.com/nginxinc/kubernetes-ingress/blob/master/nginx-controller/main.go#L27) |
+| Command-line arguments *2 | See the [arguments](https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/cli-arguments.md) | See the [arguments](cli-arguments.md) | See the [arguments](cli-arguments.md) |
 | TLS certificate and key for the default server | Required as a command-line argument/ auto-generated | Required as a command-line argument | Required as a command-line argument |
-| Helm chart | Supported | Coming soon | Coming soon |
+| Helm chart | Supported | Supported | Supported |
 | **Operational** |
-| Reporting the IP address(es) of the Ingress controller into Ingress resources | Supported | Coming soon | Coming soon |
+| Reporting the IP address(es) of the Ingress controller into Ingress resources | Supported | Supported | Supported |
 | Extended Status | Supported via a third-party module | Not supported | Supported |
-| Prometheus Integration | Supported | Not supported | Supported |
-| Dynamic reconfiguration of endpoints (no configuration reloading) | Not supported | Not supported | Supported |
+| Prometheus Integration | Supported | Supported | Supported |
+| Dynamic reconfiguration of endpoints (no configuration reloading) | Supported with a third-party Lua module | Not supported | Supported |
 
 Notes:
 

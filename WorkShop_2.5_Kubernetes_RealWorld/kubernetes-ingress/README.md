@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.org/nginxinc/kubernetes-ingress.svg?branch=master)](https://travis-ci.org/nginxinc/kubernetes-ingress)
+[![Build Status](https://travis-ci.org/nginxinc/kubernetes-ingress.svg?branch=master)](https://travis-ci.org/nginxinc/kubernetes-ingress)  [![FOSSA Status](https://app.fossa.io/api/projects/custom%2B1062%2Fgithub.com%2Fnginxinc%2Fkubernetes-ingress.svg?type=shield)](https://app.fossa.io/projects/custom%2B1062%2Fgithub.com%2Fnginxinc%2Fkubernetes-ingress?ref=badge_shield)  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)  [![Go Report Card](https://goreportcard.com/badge/github.com/nginxinc/kubernetes-ingress)](https://goreportcard.com/report/github.com/nginxinc/kubernetes-ingress)
 
 # NGINX Ingress Controller
 
@@ -35,7 +35,27 @@ We provide the following extensions to our Ingress controller:
 * [Session Persistence](examples/session-persistence) (NGINX Plus only), which guarantees that all the requests from the same client are always passed to the same backend container.
 * [Support for JWTs](examples/jwt) (NGINX Plus only), which allows NGINX Plus to authenticate requests by validating JSON Web Tokens (JWTs).
 
-Additional extensions as well as a mechanism to customize NGINX configuration are available. See [examples/customization](examples/customization).
+Additional extensions as well as a mechanism to customize NGINX configuration are available. See [ConfigMap and Annotations doc](docs/configmap-and-annotations.md).
+
+## NGINX Ingress Controller Releases
+
+We publish Ingress controller releases on GitHub. See our [releases page](https://github.com/nginxinc/kubernetes-ingress/releases).
+
+The latest stable release is [1.3.1](https://github.com/nginxinc/kubernetes-ingress/releases/tag/v1.3.1). For production use, we recommend that you choose the latest stable release.  As an alternative, you can choose the *edge* version built from the [latest commit](https://github.com/nginxinc/kubernetes-ingress/commits/master) from the master branch. The edge version is useful for experimenting with new features that are not yet published in a stable release.
+
+To use the Ingress controller, you need to have access to:
+* An Ingress controller image.
+* Installation manifests or a Helm chart.
+* Documentation and examples.
+
+It is important that the versions of those things above match. 
+
+The table below summarizes the options regarding the images, manifests, helm chart, documentation and examples and gives your links to the correct versions:
+
+| Version | Description |  Image for NGINX | Image for NGINX Plus | Installation Manifests and Helm Chart | Documentation and Examples |
+| ------- | ----------- | --------------- | -------------------- | ---------------------------------------| -------------------------- |
+| Latest stable release | For production use | `nginx/nginx-ingress:1.3.1`, `nginx/nginx-ingress:1.3.1-alpine` from [DockerHub](https://hub.docker.com/r/nginx/nginx-ingress/) or [build your own image](https://github.com/nginxinc/kubernetes-ingress/tree/v1.3.1/nginx-controller). | [Build your own image](https://github.com/nginxinc/kubernetes-ingress/tree/v1.3.1/nginx-controller). | [Manifests](https://github.com/nginxinc/kubernetes-ingress/tree/v1.3.1/install). [Helm chart](https://github.com/nginxinc/kubernetes-ingress/tree/v1.3.1/helm-chart). | [Documentation](https://github.com/nginxinc/kubernetes-ingress/tree/v1.3.1/docs). [Examples](https://github.com/nginxinc/kubernetes-ingress/tree/v1.3.1/examples). |
+| Edge | For testing and experimenting | `nginx/nginx-ingress:edge`, `nginx/nginx-ingress:edge-alpine` from [DockerHub](https://hub.docker.com/r/nginx/nginx-ingress/) or [build your own image](https://github.com/nginxinc/kubernetes-ingress/tree/master/build). | [Build your own image](https://github.com/nginxinc/kubernetes-ingress/tree/master/build). | [Manifests](https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments). [Helm chart](https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments/helm-chart). | [Documentation](https://github.com/nginxinc/kubernetes-ingress/tree/master/docs). [Examples](https://github.com/nginxinc/kubernetes-ingress/tree/master/examples). |
 
 ## Benefits of Using the Ingress Controller with NGINX Plus
 
@@ -51,14 +71,14 @@ NGINX Plus provides you with [advanced statistics](https://www.nginx.com/product
 * **JWTs** NGINX Plus can validate JSON Web Tokens (JWTs), providing a flexible authentication mechanism.
 * **Support** Support from NGINX Inc is available for NGINX Plus Ingress controller.
 
-**Note**: Deployment of the Ingress controller for NGINX Plus requires you to do one extra step: build your own [Docker image](nginx-controller) using the certificate and key for your subscription.
-The Docker image of the Ingress controller for NGINX is [available on Docker Hub](https://hub.docker.com/r/nginxdemos/nginx-ingress/).
+**Note**: Deployment of the Ingress controller for NGINX Plus requires you to do one extra step: build your own [Docker image](build) using the certificate and key for your subscription.
+The Docker image of the Ingress controller for NGINX is [available on Docker Hub](https://hub.docker.com/r/nginx/nginx-ingress/).
 
 ## Using Multiple Ingress Controllers
 
 You can run multiple Ingress controllers at the same time. For example, if your Kubernetes cluster is deployed in cloud, you can run the NGINX controller and the corresponding cloud HTTP load balancing controller. Refer to the [example](examples/multiple-ingress-controllers) to learn more.
 
-## Advanced Load Balancing/An Alternative Method of Configuration 
+## Advanced Load Balancing/An Alternative Method of Configuration
 
 When your requirements go beyond what Ingress and Ingress extensions offer or if you are looking for an alternative method of configuring NGINX, it is possible to use NGINX or NGINX Plus without the Ingress Controller.
 

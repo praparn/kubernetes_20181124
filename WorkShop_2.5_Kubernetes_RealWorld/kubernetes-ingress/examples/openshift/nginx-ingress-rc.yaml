@@ -15,7 +15,7 @@ spec:
     spec:
       serviceAccountName: nginx-ingress
       containers:
-      - image: nginxdemos/nginx-ingress:1.0.0
+      - image: nginx/nginx-ingress:edge
         imagePullPolicy: Always
         name: nginx-ingress
         ports:
@@ -28,6 +28,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         # Uncomment the lines below to enable extensive logging and/or customization of
         # NGINX configuration with configmaps
         args:

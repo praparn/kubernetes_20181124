@@ -13,8 +13,12 @@ ingress resource.
 Masters cannot contain the following annotations:
 * nginx.org/rewrites
 * nginx.org/ssl-services
+* nginx.org/grpc-services
 * nginx.org/websocket-services
 * nginx.com/sticky-cookie-services
+* nginx.com/health-checks
+* nginx.com/health-checks-mandatory
+* nginx.com/health-checks-mandatory-queue
 
 A Minion is declared using `nginx.org/mergeable-ingress-type: minion`. A Minion will be used to append different
 locations to an ingress resource with the Master value. TLS configurations are not allowed. Multiple minions can be
@@ -32,10 +36,21 @@ Minions cannot contain the following annotations:
 * nginx.org/server-tokens
 * nginx.org/listen-ports
 * nginx.org/listen-ports-ssl
-* nginx.com/jwt-key
-* nginx.com/jwt-realm
-* nginx.com/jwt-token
-* nginx.com/jwt-login-url
+* nginx.org/server-snippets
+
+Minions inherent the following annotations from the master, unless they override them:
+* nginx.org/proxy-connect-timeout
+* nginx.org/proxy-read-timeout
+* nginx.org/client-max-body-size
+* nginx.org/proxy-buffering
+* nginx.org/proxy-buffers
+* nginx.org/proxy-buffer-size
+* nginx.org/proxy-max-temp-file-size
+* nginx.org/location-snippets
+* nginx.org/lb-method
+* nginx.org/keepalive
+* nginx.org/max-fails
+* nginx.org/fail-timeout
 
 Note: Ingress Resources with more than one host cannot be used.
 
@@ -53,6 +68,10 @@ load balancing for that application using Ingress resources with the `nginx.org/
 2. Save the public IP address of the Ingress controller into a shell variable:
     ```
     $ IC_IP=XXX.YYY.ZZZ.III
+    ```
+3. Save the HTTPS port of the Ingress controller into a shell variable:
+    ```
+    $ IC_HTTPS_PORT=<port number>
     ```
 
 ## 2. Deploy the Cafe Application
@@ -91,20 +110,18 @@ certificate and the --resolve option to set the Host header of a request with ``
     
     To get coffee:
     ```
-    $ curl --resolve cafe.example.com:443:$IC_IP https://cafe.example.com/coffee --insecure
+    $ curl --resolve cafe.example.com:$IC_HTTPS_PORT:$IC_IP https://cafe.example.com:$IC_HTTPS_PORT/coffee --insecure
     Server address: 10.12.0.18:80
     Server name: coffee-7586895968-r26zn
     ...
     ```
     If you prefer tea:
     ```
-    $ curl --resolve cafe.example.com:443:$IC_IP https://cafe.example.com/tea --insecure
+    $ curl --resolve cafe.example.com:$IC_HTTPS_PORT:$IC_IP https://cafe.example.com:$IC_HTTPS_PORT/tea --insecure
     Server address: 10.12.0.19:80
     Server name: tea-7cd44fcb4d-xfw2x
     ...
     ```
-
-    **Note**: If you're using a NodePort service to expose the Ingress controller, replace port 443 in the commands above with the node port that corresponds to port 443.
     
 ## 5. Examine the Configuration
 
