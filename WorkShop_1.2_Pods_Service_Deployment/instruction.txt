@@ -45,6 +45,8 @@ docker image pull labdocker/cadvisor:latest
 
 8. Test access to container in Pods by command:
 	kubectl exec -it webtest -c webtest sh
+	more mainlite.py
+	exit
 
 8. Clear environment by delete Pods and service by command:
 	kubectl delete  -f webtest_pod.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_1.2_Pods_Service_Deployment/singlecontainer/webtest_pod.yml)

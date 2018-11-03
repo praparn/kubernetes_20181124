@@ -51,9 +51,9 @@ Note: This instruction will demonstrate about how to use RC for maintain avaliab
 	---------------------------------------------------
 
 8. Test curl and web browser for access web by command:
-		curl http://<ip of minikube>:32500
+		curl http://<Private IP>:32500
 
-		open browser for test can operate: http://<ip of minikube>:32500
+		open browser for test can operate: http://<Public IP>:32500
 
 9. Test scale RC by command:
 	kubectl scale --replicas=10 rc/webtest

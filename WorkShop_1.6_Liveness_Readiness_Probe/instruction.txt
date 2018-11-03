@@ -5,7 +5,7 @@ Note: This instruction will demonstrate about how to check liveness_readiness pr
 Part 1: Exec Probe
 This workshop will use execute some command on container for probe
 ====================================================
-
+0. Access to workshop folder by command: "cd ~/kubernetes_20181124/WorkShop_1.6_Liveness_Readiness_Probe/"
 1. Create Deployment and check status by command:
 	kubectl create -f webtest_deploy_liveness_readiness_exec.yml 	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_1.6_Liveness_Readiness_Probe/webtest_deploy_liveness_readiness_exec.yml )
 	kubectl create -f webtest_svc.yml 	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20180701/master/WorkShop_1.6_Liveness_Readiness_Probe/webtest_svc.yml )
@@ -24,7 +24,7 @@ This workshop will use execute some command on container for probe
 	rm main.py
 	exit	
 
-4. Check status of Pods by command:
+4. Check status of Pods by command: (Wait about 2 -3 min)
 	kubectl get pods --show-labels
 	kubectl describe pods/<pods name>
 
