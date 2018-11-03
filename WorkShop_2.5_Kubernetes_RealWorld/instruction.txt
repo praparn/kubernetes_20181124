@@ -4,7 +4,7 @@ Note: This instruction will start lab for kubernetes's cluster for real workshop
 0. Reinitial your machine before grouping with your friend by command:
 	sudo su -
     kubeadm reset           ==> Answer 'y'
-    docker system prune -af  ==> Answer 'y'
+    docker system prune -af
 	reboot
 	
 1. Check "LAB" sheet for your group and inform your team for all node information like below:
@@ -32,6 +32,7 @@ tmux new -s Lab
 
 3. (Master) initial cluster by command:
 	sudo su -
+	swapoff -a
 	kubeadm init --kubernetes-version=v1.12.2 --pod-network-cidr=192.168.0.0/16 --apiserver-cert-extra-sans <public ip>
 	exit
 
@@ -64,28 +65,19 @@ tmux new -s Lab
 	kubectl create clusterrolebinding insecure-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
 	watch kubectl get pods --all-namespaces
 
-11. (Master) Create HeapSter and Grafana for Monitoring Kuberernetes by command:
-	kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/heapster/deploy/kube-config/rbac/heapster-rbac.yaml
-	kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/heapster/deploy/kube-config/influxdb/grafana.yaml
-	kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/heapster/deploy/kube-config/influxdb/heapster.yaml
-	kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/heapster/deploy/kube-config/influxdb/influxdb.yaml
+11. (local) Test open browser for check performance via grafana:
+	http://<Public IP>:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/   
 
-12. (Master) 
-
-11. (local) Edit file adminconfig.conf for change ip address from private to public ip:
-vi adminconfig.conf
-
-12. (local) Configure local kubectl for access and command cluster:
-kubectl --kubeconfig ./adminconfig.conf get nodes
-kubectl --kubeconfig ./adminconfig.conf get svc
+12. (local) Edit file "adminconfig and test access kubectl for access and command cluster:
+	vi ./adminconfig			==> Edit IP Address to Public IP Address
+	kubectl --kubeconfig ./adminconfig.conf get nodes
+	kubectl --kubeconfig ./adminconfig.conf get svc
 
 13. (local) Open dashboard by command:
 kubectl --kubeconfig ./adminconfig.conf proxy --accept-hosts '.*'
 
 14. (local) Open browser by command
 http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
-
-
 
 15. (Worker1, Worker2) ssh and join to cluster by command:
 sudo su -
@@ -96,7 +88,6 @@ exit
 16. (Master) Check Node in Cluster by command (This take 5 - 10 min):
 watch kubectl get nodes
 
-
 17. (Master)Check Pods from all cluster system running by command:
 watch kubectl get pods --all-namespaces
 
@@ -106,7 +97,7 @@ kubectl get pods -o wide
 kubectl expose deployment webtest --target-port=80 --type=NodePort
 kubectl get svc -o wide
 
-19. (Master) Test get web outside:
+19. (loal) Test get web outside:
 https://x.x.x.x:xxxx
 https://x.x.x.x:xxxx
 https://x.x.x.x:xxxx
@@ -120,22 +111,25 @@ kubectl delete svc/webtest
 
 21. (Master) Create ingress set:
 # Create Namespace and SA 
-kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/install/common/ns-and-sa.yaml
+kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/deployments/common/ns-and-sa.yaml
 
 # Create Default Secret for 404 Return
-kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/install/common/default-server-secret.yaml
+kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/deployments/common/default-server-secret.yaml
 
 # Add optional for configure nginx customization (Ref: https://github.com/nginxinc/kubernetes-ingress/tree/master/examples/customization)
-kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/install/common/nginx-config.yaml
+kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/deployments/common/nginx-config.yaml
 
 # Configure rbac
-kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/install/rbac/rbac.yaml
+kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/deployments/rbac/rbac.yaml
 
 # Create Daemon Setup
-kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/install/daemon-set/nginx-ingress.yaml
+kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.5_Kubernetes_RealWorld/kubernetes-ingress/deployments/daemon-set/nginx-ingress.yaml
 
 # Check ingress running
 watch kubectl get pods --namespace=nginx-ingress
+
+# Test access via browser (Expect: 404 Not Found)
+http://<<Public IP of Any Node>
 
 22. (Master) Test deploy ingress service
 
@@ -151,30 +145,14 @@ watch kubectl get pods --namespace=nginx-ingress
 	kubectl get ing -o wide
 	kubectl describe ing/ingresswebtest
 
-23. Test access website by command or browser:
+23. (local) Test access website by command or browser:
 	curl http://<Public IP of Any Node> -H 'Host:webtest1.kuberneteslabthailand.com'
 	curl http://<Public IP of Any Node> -H 'Host:webtest2.kuberneteslabthailand.com'
 
-24. Delete Existing Ingress by command:
+24. (Master) Delete Existing Ingress by command:
 	kubectl delete -f ingress_webtest.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.4_Ingress_Network/ingress_webtest.yml)
-
-25. Create TLS Secret by command:
-	kubectl create -f ingress_webtest_tls_secret_webtest1.yml 	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls_secret_webtest1.yml )
-	kubectl create -f ingress_webtest_tls_secret_webtest2.yml 	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls_secret_webtest2.yml )
-
-26. Create ingress for TLS by command:
-	kubectl create -f ingress_webtest_tls.yml 	(In case run via github: kubectl create -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls.yml )
-	kubectl get ing/ingresswebtesttls -o wide
-	kubectl describe ing/ingresswebtesttls
-
-27. Test access website by browser:
-	https://webtest1.kuberneteslabthailand.com
-	https://webtest2.kuberneteslabthailand.com
 	
-28. Clean Up Lab:
-	kubectl delete -f ingress_webtest_tls.yml	 (In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls.yml)
-	kubectl delete -f ingress_webtest_tls_secret_webtest1.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls_secret_webtest1.yml)
-	kubectl delete -f ingress_webtest_tls_secret_webtest2.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.4_Ingress_Network/ingress_webtest_tls_secret_webtest2.yml)
+25. (Master) Clean Up Lab:
 	kubectl delete -f webtest_deploy.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.4_Ingress_Network/webtest_deploy.yml)
 	kubectl delete -f webtest_deploy2.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.4_Ingress_Network/webtest_deploy2.yml)
 
