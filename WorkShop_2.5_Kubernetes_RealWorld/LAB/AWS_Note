@@ -1,5 +1,0 @@
-AWS Farm:
-Master    13.229.65.124     10.0.1.211  ssh -i "k8s_lab.pem" ubuntu@ec2-13-229-65-124.ap-southeast-1.compute.amazonaws.com
-Node1     52.77.229.122     10.0.1.221  ssh -i "k8s_lab.pem" ubuntu@ec2-52-77-229-122.ap-southeast-1.compute.amazonaws.com
-Node2     52.221.191.148    10.0.1.243  ssh -i "k8s_lab.pem" ubuntu@ec2-52-221-191-148.ap-southeast-1.compute.amazonaws.com
-

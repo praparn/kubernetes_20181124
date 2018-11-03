@@ -1,0 +1,4 @@
+Machine name		            			Roles:						IP Address: (Private)		IP Address: (Public)
+Training_DockerZerotoHero_StudentGX_1	    Master						10.0.1.211					52.221.191.193					
+Training_DockerZerotoHero_StudentGX_2       NodePort					10.0.1.135					3.0.102.211
+Training_DockerZerotoHero_StudentGX_3   	NodePort					10.0.1.47					18.136.207.236

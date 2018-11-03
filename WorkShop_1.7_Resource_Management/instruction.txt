@@ -12,14 +12,7 @@ Part0: Create Dashboard and Metric Server
 	kubectl create clusterrolebinding insecure-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
 	kubectl proxy --address='<Private IP>' --accept-hosts='^*$'
 
-	*Test by open browser: http://<Public IP>:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
-
-2. Create Metric Server: (Open Another Session)
-	1. cd ~/kubernetes_20181124/WorkShop_1.6_Liveness_Readiness_Probe/
-	1. git clone https://github.com/kubernetes-incubator/metrics-server.git
-	2. cd metrics-server/
-	3. kubectl create -f deploy/1.8+/
-	
+	*Test by open browser: http://<Public IP>:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/   
 ====================================================
 Part1: Container level configuration:
 ====================================================
