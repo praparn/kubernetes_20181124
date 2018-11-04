@@ -1,5 +1,5 @@
 ====================================================
-Part0: Enable Heapster and Metric Server
+Part0: Install Metric Server
 ====================================================
 1. (Master) Create Metric Server:
 	git clone https://github.com/kubernetes-incubator/metrics-server.git
@@ -24,7 +24,7 @@ Part 1: HPA Configuration:
 4. Apply HPA by command:
 	kubectl autoscale deployment/webtest --min=1 --max=10 --cpu-percent=10 
 
-5. Monitor by command:
+5. Monitor by command: (5 - 10 min)
 	watch kubectl get hpa		==> Until Get Performance Data
 
 	kubectl describe hpa/webtest
