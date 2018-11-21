@@ -45,7 +45,7 @@ df -kh
 ===================================================
 Part 2: Integrate with Persistency Volume (PV),  and Persistency Volume Claim (PVC)
 ===================================================
-2. (Master) Check workshop on Cloud
+1. (Master) Check workshop on Cloud
 cd ~/kubernetes_20181124/WorkShop_2.7_Persistent_Storage/
 
 2. (Master) Copy sourcecode to NFS/Create Storage Class/ Volume (PV/PVC)/Deployment by command:

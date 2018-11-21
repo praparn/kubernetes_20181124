@@ -52,13 +52,13 @@ Part2: Create Application and Service for Operate
 ====================================================
 Part3: Install Prometheus-operator with Helm
 ====================================================
-1. (Master) Create ServiceAccount for Tiller in the kube-system namespace by command:
+1. (Master) Create ServiceAccount for Tiller in the kube-system namespace by command: (Optional)
 	kubectl -n kube-system create sa tiller
 
-2. (Master) Create ClusterRoleBinding for Tiller by command:
+2. (Master) Create ClusterRoleBinding for Tiller by command: (Optional)
 	kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
 
-3. (Master) Install Tiller, specifying the new ServiceAccount
+3. (Master) Install Tiller, specifying the new ServiceAccount (Optional)
 	helm init --service-account tiller
 
 4. (Master) Install Prometheus-operator by command:
@@ -103,7 +103,6 @@ Part5: Test generate load
 	while true; sleep 0.001; do wget -q -O- http://webtest.default.svc.cluster.local:5000; done
 
 2. (Master) Monitor Performance via Grafana and command line: (Interval is 5 min)
-	kubectl get hpa
 	kubectl top pods
 	kubectl top nodes
 

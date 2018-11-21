@@ -7,7 +7,7 @@ Part0: Install Metric Server
 	kubectl get pods --all-namespaces
 	kubectl logs pods/<metrics's pods name> -n=kube-system
 
-2. (Master) Test get performance data from metric server by command:
+2. (Master) Test get performance data from metric server by command: (Wait 5 min)
 	kubectl top nodes
 ====================================================
 Part 1: HPA Configuration:
@@ -42,7 +42,7 @@ Part 1: HPA Configuration:
 
 8. Scale Down by Ctrl+C on load-generate
 
-9. Monitor performance: (Interval is 5 min)
+9. Monitor performance: (Interval is 10 min)
 	kubectl get hpa
 	kubectl top pods
 	kubectl top nodes

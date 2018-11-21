@@ -25,7 +25,6 @@ Note: This instruction will demonstrate about how to use Deployment/RS for deplo
 	kubectl get rs
 
 6. Test curl and web browser for access web by command:
-	curl http://<Private IP>:32500
 
 	open browser for test can operate: http://<Public IP>:32500
 
@@ -44,9 +43,8 @@ Note: This instruction will demonstrate about how to use Deployment/RS for deplo
 	kubectl get pods
 
 11. Test curl and web browser for access web by command:
-	curl http://<Private IP>:32500
 
-	open browser for test can operate: http://<ip of minikube>:32500
+	open browser for test can operate: http://<Public IP>:32500
 
 
 12. Update version of image on deployment by command:
@@ -83,7 +81,6 @@ Note: This instruction will demonstrate about how to use Deployment/RS for deplo
 	kubectl rollout status deployment/webtest
 
 18. Test curl and web browser for access web by command:
-			curl http://<Private IP>:32500
 
 			open browser for test can operate: http://<Public IP>:32500
 

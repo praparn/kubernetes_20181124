@@ -158,7 +158,3 @@ http://<<Public IP of Any Node>
 	kubectl delete -f webtest_deploy2.yml	(In case run via github: kubectl delete -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_2.4_Ingress_Network/webtest_deploy2.yml)
 
 
-	====================================== Dashboard for Monitor (If we have time on last class) ==================================================
-	https://github.com/camilb/prometheus-kubernetes
-
-
