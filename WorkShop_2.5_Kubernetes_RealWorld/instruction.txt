@@ -33,7 +33,7 @@ tmux new -s Lab
 3. (Master) initial cluster by command:
 	sudo su -
 	swapoff -a
-	kubeadm init --kubernetes-version=v1.12.2 --pod-network-cidr=192.168.0.0/16 --apiserver-cert-extra-sans <public ip>
+	kubeadm init --kubernetes-version=v1.13.0 --pod-network-cidr=192.168.0.0/16 --apiserver-cert-extra-sans <public ip>
 	exit
 
 	*Remark: Need to record token Output
