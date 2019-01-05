@@ -61,8 +61,8 @@ tmux new -s Lab
 	watch kubectl get pods --all-namespaces
 
 10. (Master) Install dashboard by command:(Take 5 - 10 min)
-	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
-	kubectl create clusterrolebinding insecure-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
+	kubectl apply -f https://raw.githubusercontent.com/praparn/kubernetes_20181124/master/WorkShop_1.7_Resource_Management/dashboard.yml
+	kubectl proxy --address='<Private IP>' --accept-hosts='^*$'
 	watch kubectl get pods --all-namespaces
 	kubectl proxy --address='<Private IP of Master>' --accept-hosts='.*' 
 
